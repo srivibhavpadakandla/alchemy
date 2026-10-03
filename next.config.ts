@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+initOpenNextCloudflareForDev();
+
 const config: NextConfig = {
-  serverExternalPackages: ["pdf-parse", "pdfjs-dist"],
   turbopack: { root: process.cwd() },
   devIndicators: false,
   async headers() {

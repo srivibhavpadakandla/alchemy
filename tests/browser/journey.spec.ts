@@ -85,7 +85,7 @@ test("source drawer, real setup errors, manual editing and export", async ({
   await file.saveAs("media/demo-export.json");
 });
 test("authentication and cross-origin APIs fail closed", async ({
-  request,
+  request, baseURL,
 }) => {
   const denied = await request.get("/api/programs/foreign");
   expect(denied.ok()).toBeFalsy();
@@ -95,7 +95,7 @@ test("authentication and cross-origin APIs fail closed", async ({
   });
   expect(patch.status()).toBe(403);
   const voice = await request.post("/api/voice", {
-    headers: { origin: "http://localhost:3210" },
+    headers: { origin: new URL(baseURL || "http://localhost:3210").origin },
     data: { programId: "demo", mode: "demo" },
   });
   expect(voice.status()).toBe(503);

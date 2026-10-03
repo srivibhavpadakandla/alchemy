@@ -19,6 +19,7 @@ test("critical accessibility checks", async ({ page }) => {
       .analyze();
     reports.push({ route, violations: results.violations });
   }
+  fs.mkdirSync("media", { recursive: true });
   fs.writeFileSync(
     "media/accessibility.json",
     JSON.stringify(reports, null, 2),

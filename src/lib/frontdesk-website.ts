@@ -1,9 +1,10 @@
-import { lookup } from "node:dns/promises";
+import { lookup, resolve4 } from "node:dns/promises";
 import { isIP } from "node:net";
 import { request } from "node:https";
 import { DomainError } from "./commands";
 
 export function publicIPv4(address: string) {
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) return false;
   const p = address.split(".").map(Number);
   if (p.length !== 4 || p.some((n) => !Number.isInteger(n) || n < 0 || n > 255))
     return false;
@@ -29,6 +30,8 @@ export function websiteUrl(value: string) {
     url.password ||
     (url.port && url.port !== "443") ||
     isIP(url.hostname) ||
+    url.hostname.startsWith("[") ||
+    url.hostname.endsWith(".") ||
     !url.hostname.includes(".") ||
     /\.(local|localhost|internal)$/i.test(url.hostname)
   )
@@ -37,8 +40,7 @@ export function websiteUrl(value: string) {
     );
   return url;
 }
-export async function readWebsite(value: string) {
-  const url = websiteUrl(value);
+async function readNodeWebsite(url: URL) {
   const addresses = await lookup(url.hostname, { all: true, family: 4 });
   if (
     !addresses.length ||
@@ -49,7 +51,7 @@ export async function readWebsite(value: string) {
       403,
     );
   const address = addresses[0].address;
-  const html = await new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     let deadline: ReturnType<typeof setTimeout> | undefined;
     const fail = (error: unknown) => {
       clearTimeout(deadline);
@@ -117,6 +119,88 @@ export async function readWebsite(value: string) {
     req.on("error", fail);
     req.end();
   });
+}
+
+async function readCloudflareWebsite(url: URL) {
+  const controller = new AbortController();
+  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+  let deadline: ReturnType<typeof setTimeout> | undefined;
+  const timedOut = new DomainError("Website request timed out.");
+  const timeout = new Promise<never>((_, reject) => {
+    deadline = setTimeout(() => {
+      controller.abort();
+      reject(timedOut);
+    }, 10000);
+  });
+  const intake = async () => {
+    // Workers does not implement dns.lookup. This screens DNS answers; actual
+    // egress is enforced by Cloudflare with global_fetch_strictly_public.
+    const addresses = await resolve4(url.hostname);
+    controller.signal.throwIfAborted();
+    if (!addresses.length || addresses.some((address) => !publicIPv4(address)))
+      throw new DomainError(
+        "This website resolves to a restricted network address.",
+        403,
+      );
+    const response = await fetch(url.href, {
+      method: "GET",
+      headers: {
+        Accept: "text/html,text/plain",
+        "User-Agent": "AlchemyWebsiteContext/1.0",
+      },
+      credentials: "omit",
+      redirect: "error",
+      signal: controller.signal,
+    });
+    controller.signal.throwIfAborted();
+    if (response.status !== 200)
+      throw new DomainError(
+        `Website returned ${response.status}. Redirects are not followed; enter the final URL.`,
+      );
+    if (
+      !/^(text\/html|text\/plain)\b/i.test(
+        response.headers.get("content-type") || "",
+      )
+    )
+      throw new DomainError("Website must return HTML or plain text.");
+    if (!response.body) return "";
+    reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let length = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      controller.signal.throwIfAborted();
+      if (done) break;
+      length += value.byteLength;
+      if (length > 250_000)
+        throw new DomainError("Page exceeds the 250 KB context intake limit.");
+      chunks.push(value);
+    }
+    const body = new Uint8Array(length);
+    let offset = 0;
+    for (const chunk of chunks) {
+      body.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return new TextDecoder().decode(body);
+  };
+  try {
+    return await Promise.race([intake(), timeout]);
+  } catch (error) {
+    if (controller.signal.aborted) throw timedOut;
+    throw error;
+  } finally {
+    clearTimeout(deadline);
+    controller.abort();
+    if (reader) void reader.cancel().catch(() => {});
+  }
+}
+
+export async function readWebsite(value: string) {
+  const url = websiteUrl(value);
+  const html = await (process.env.ALCHEMY_RUNTIME === "cloudflare"
+    ? readCloudflareWebsite(url)
+    : readNodeWebsite(url));
   const text = html
     .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]+>/g, " ")

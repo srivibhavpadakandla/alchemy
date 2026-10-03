@@ -51,7 +51,7 @@ test("real PDF endpoint extracts fictional text and rejects a document without t
   expect(response.status()).toBe(200);
   const parsed = await response.json();
   expect(parsed).toMatchObject({
-    parser: "pdf-parse",
+    parser: "unpdf",
     pages: 1,
     status: "extracted",
   });

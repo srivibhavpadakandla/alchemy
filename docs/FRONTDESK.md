@@ -12,6 +12,10 @@ The external booking path uses verified live identity, a customer scoped to the 
 
 Website intake validates and pins public DNS, rejects redirects and restricted addresses, and bounds response size and time. Text, Markdown and text PDFs are supported; scanned PDFs fail with an explicit error. Intake is saved before a genuine OpenAI or enabled loopback Codex task runs. Exact original source IDs and quote matches are validated before draft facts are accepted. Owner edits preserve the extracted value and original citation; each fact must be verified before saving the operating brief. Draft knowledge is versioned separately. No model findings are fabricated when credentials or execution fail.
 
+PDF intake uses pinned `unpdf` 1.8.1 and its real embedded PDF.js serverless parser. This replaces the native canvas and separate worker dependencies used by the earlier Node parser. Upload authorization runs before parsing; documents must be PDFs of at most 5 MB, 20 pages and 6,000 extracted characters. Oversized or textless files are rejected without accepting partial text. The document loading task is destroyed after each extraction.
+
+Five genuine parser checks passed in Node and in an isolated local Cloudflare Workers runtime with the app's `nodejs_compat`, `global_fetch_strictly_public` and 2026-10-03 compatibility settings: exact fictional text extraction, no-text rejection, page-limit rejection, character-limit rejection and invalid-PDF rejection. This verifies the parser in Workers without exposing a debug route or bypassing app authorization. Hosted authenticated document intake still requires its own acceptance check, and local Workers execution does not establish the hosted plan's CPU capacity. See the [official unpdf runtime documentation](https://github.com/unjs/unpdf).
+
 ## Calendar and SMS setup
 
 Apply all numbered Supabase migrations, including `007_frontdesk_bookings.sql`. Populate the server-only calendar variables in `.env.local`. The refresh token must belong to the intended business calendar; do not paste it into chat or a business knowledge document. The current server adapter binds it to `FRONTDESK_PROGRAM_ID`.

@@ -9,3 +9,6 @@ test-results/
 .launchguild-local/
 media/
 artifacts/
+.open-next/
+.wrangler/
+.dev.vars*

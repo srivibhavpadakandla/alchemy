@@ -1,4 +1,4 @@
-import { PDFParse } from "pdf-parse";
+import { extractFrontdeskPdf } from "@/lib/frontdesk-pdf";
 import { apiError, checkOrigin, loadProgram } from "@/lib/repository";
 import { DomainError } from "@/lib/commands";
 export const runtime = "nodejs";
@@ -61,33 +61,8 @@ export async function POST(req: Request) {
     const data = new Uint8Array(await file.arrayBuffer());
     if (new TextDecoder().decode(data.slice(0, 5)) !== "%PDF-")
       throw new DomainError("The uploaded file is not a PDF.");
-    const parser = new PDFParse({ data });
-    try {
-      const parsed = await parser.getText({ first: 20 });
-      const text = parsed.text.trim();
-      if (
-        !text ||
-        text
-          .replace(/--\s*\d+\s*of\s*\d+\s*--/g, "")
-          .replace(/[^\p{L}\p{N}]/gu, "").length < 10
-      )
-        throw new DomainError(
-          "No usable PDF text found. Scanned documents require OCR or an approved text version. No training text was created.",
-        );
-      if (parsed.total > 20 || text.length > 6000)
-        throw new DomainError(
-          "PDF training intake supports up to 20 pages and 6,000 extracted characters. Provide a smaller document or approved text excerpt; no partial file was accepted.",
-        );
-      return Response.json({
-        name: file.name.slice(0, 200),
-        text,
-        pages: parsed.total,
-        parser: "pdf-parse",
-        status: "extracted",
-      });
-    } finally {
-      await parser.destroy();
-    }
+    const parsed = await extractFrontdeskPdf(data);
+    return Response.json({ name: file.name.slice(0, 200), ...parsed });
   } catch (e) {
     return apiError(e);
   }
