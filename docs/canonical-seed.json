@@ -1,0 +1,291 @@
+{
+  "schema_version": "launchguild-design-partner-demo-v1",
+  "mode": "isolated_fictional_demo",
+  "disclosure": "All companies, notes, values, estimates and outcomes in this file are fictional fixtures. No customers, payments or external integrations are evidenced.",
+  "currency": "USD",
+  "value_basis": "conditional_annual_opportunity",
+  "current_arr": 0,
+  "capacity": {
+    "period": "named_demo_month",
+    "unit": "founder_estimated_engineering_points",
+    "total": 100,
+    "mandatory_core": 35,
+    "support_reserve": 15,
+    "discretionary": 50
+  },
+  "partners": [
+    {
+      "id": "northstar",
+      "name": "Northstar Logistics",
+      "stage": "active_pilot",
+      "opportunity": 30000,
+      "required_work_ids": [
+        "salesforce"
+      ],
+      "optional_work_ids": [],
+      "commercial_gates": {
+        "buyer": "unknown",
+        "price": "unknown",
+        "security": "unknown"
+      }
+    },
+    {
+      "id": "juniper",
+      "name": "Juniper Operations",
+      "stage": "active_pilot",
+      "opportunity": 8000,
+      "required_work_ids": [
+        "salesforce"
+      ],
+      "optional_work_ids": [
+        "csv"
+      ],
+      "commercial_gates": {
+        "buyer": "unknown",
+        "price": "unknown",
+        "security": "unknown"
+      }
+    },
+    {
+      "id": "kite",
+      "name": "Kite Enterprise",
+      "stage": "active_pilot",
+      "opportunity": 50000,
+      "required_work_ids": [
+        "custom_approval"
+      ],
+      "optional_work_ids": [],
+      "commercial_gates": {
+        "buyer": "unknown",
+        "price": "unknown",
+        "security": "unknown"
+      }
+    }
+  ],
+  "work_items": [
+    {
+      "id": "salesforce",
+      "title": "Shared Salesforce integration",
+      "proposed_class": "integration",
+      "central_effort": 20,
+      "effort_range": [
+        16,
+        26
+      ],
+      "estimator": "fictional_team",
+      "dependencies": [],
+      "included_scope": "Shared implementation including the fixture's known two-account setup; additional unknown scope must be estimated separately",
+      "partner_ids": [
+        "northstar",
+        "juniper"
+      ],
+      "implementation_state": "proposed"
+    },
+    {
+      "id": "csv",
+      "title": "Optional bulk CSV import",
+      "proposed_class": "core_product",
+      "central_effort": 8,
+      "effort_range": [
+        6,
+        12
+      ],
+      "estimator": "fictional_team",
+      "dependencies": [],
+      "partner_ids": [
+        "juniper"
+      ],
+      "implementation_state": "proposed"
+    },
+    {
+      "id": "custom_approval",
+      "title": "One-off approval workflow",
+      "proposed_class": "one_customer_customization",
+      "central_effort": 46,
+      "effort_range": [
+        40,
+        60
+      ],
+      "estimator": "fictional_team",
+      "dependencies": [],
+      "partner_ids": [
+        "kite"
+      ],
+      "implementation_state": "proposed"
+    }
+  ],
+  "sources": [
+    {
+      "id": "northstar-note-1",
+      "partner_id": "northstar",
+      "kind": "fixture_note",
+      "text": "Our pilot's required product capability is the scoped Salesforce integration. The USD 30,000 annual opportunity remains hypothetical and the buyer, pricing and security conditions are unconfirmed."
+    },
+    {
+      "id": "juniper-note-1",
+      "partner_id": "juniper",
+      "kind": "fixture_note",
+      "text": "We require the same scoped Salesforce integration. Bulk CSV import is a requested optional improvement, not a separate purchase. Our hypothetical annual opportunity is USD 8,000; commercial conditions are unconfirmed."
+    },
+    {
+      "id": "kite-note-1",
+      "partner_id": "kite",
+      "kind": "fixture_note",
+      "text": "The pilot requests a one-off approval workflow specific to our operations. The hypothetical annual opportunity is USD 50,000. Wider reuse, commercial conditions and long-term support requirements remain unconfirmed."
+    },
+    {
+      "id": "kite-conversation-2",
+      "partner_id": "kite",
+      "kind": "fixture_note",
+      "text": "We will evaluate your custom approval request and return a scoped plan. No delivery date or feature commitment has been agreed."
+    }
+  ],
+  "promises": [],
+  "payment_receipts": [],
+  "scenarios": [
+    {
+      "id": "shared",
+      "selected_work_ids": [
+        "salesforce"
+      ],
+      "expected": {
+        "selected_effort": 20,
+        "total_with_reserves": 70,
+        "remaining": 30,
+        "unique_partner_count": 2,
+        "associated_conditional_annual_value": 38000
+      }
+    },
+    {
+      "id": "shared_plus_csv",
+      "selected_work_ids": [
+        "salesforce",
+        "csv"
+      ],
+      "expected": {
+        "selected_effort": 28,
+        "total_with_reserves": 78,
+        "remaining": 22,
+        "unique_partner_count": 2,
+        "associated_conditional_annual_value": 38000,
+        "incremental_csv_deal_value": 0
+      }
+    },
+    {
+      "id": "custom",
+      "selected_work_ids": [
+        "custom_approval"
+      ],
+      "expected": {
+        "selected_effort": 46,
+        "total_with_reserves": 96,
+        "remaining": 4,
+        "unique_partner_count": 1,
+        "associated_conditional_annual_value": 50000,
+        "total_capacity_share": 0.46,
+        "discretionary_capacity_share": 0.92,
+        "upper_range_total_with_reserves": 110
+      }
+    },
+    {
+      "id": "overbooked",
+      "selected_work_ids": [
+        "salesforce",
+        "custom_approval"
+      ],
+      "expected": {
+        "selected_effort": 66,
+        "total_with_reserves": 116,
+        "over_capacity": 16
+      }
+    }
+  ],
+  "concentration_illustrations": [
+    {
+      "id": "all_three_future",
+      "horizon": "longer_horizon_not_current_month_delivery",
+      "assume_converted_partner_ids": [
+        "northstar",
+        "juniper",
+        "kite"
+      ],
+      "existing_arr": 0,
+      "expected_total_conditional_arr": 88000,
+      "expected_kite_share": 0.5681818181818182
+    },
+    {
+      "id": "custom_only_future",
+      "horizon": "hypothetical_conversion",
+      "assume_converted_partner_ids": [
+        "kite"
+      ],
+      "existing_arr": 0,
+      "expected_total_conditional_arr": 50000,
+      "expected_kite_share": 1.0
+    }
+  ],
+  "readiness_example": {
+    "applicable_checks": 10,
+    "met": 6,
+    "blocked": 2,
+    "unknown": 2,
+    "expected_checklist_completion": 0.6,
+    "disclosure": "Checklist completion is not probability of purchase; this is a standalone fixture, not evidence about a listed partner."
+  },
+  "product_context": {
+    "name": "RelayOps",
+    "origin": "fictional_demo_MVP",
+    "description": "A fictional existing MVP for routine B2B operations workflows. LaunchGuild operates the partner program; it does not implement RelayOps.",
+    "target_segment": "Small and mid-sized operations teams with shared workflow needs",
+    "boundary": "One-off enterprise workflow is a strategic exception requiring founder review"
+  },
+  "pilot_agreements": [
+    {
+      "id": "northstar-pilot-v1",
+      "partner_id": "northstar",
+      "version": 1,
+      "origin": "fictional_fixture_agreement",
+      "start_day": 0,
+      "end_day": 30,
+      "decision_day": 30,
+      "metric_id": "northstar-completion-v1",
+      "success_metric": {
+        "name": "Workflow completion rate",
+        "threshold": 0.95,
+        "unit": "fraction",
+        "window": "demo_days_14_to_20"
+      },
+      "required_purchase_work_ids": [
+        "salesforce"
+      ],
+      "commercial_terms": "unknown"
+    }
+  ],
+  "metric_observations": [
+    {
+      "id": "northstar-observation-v1",
+      "partner_id": "northstar",
+      "metric_id": "northstar-completion-v1",
+      "origin": "fictional_fixture_observation",
+      "numerator": 98,
+      "denominator": 100,
+      "window": "demo_days_14_to_20",
+      "collection_health": "fixture_healthy",
+      "expected_fraction": 0.98,
+      "expected_agreed_product_outcome": "met",
+      "disclosure": "Fixture engineering input only, not real product performance or demand."
+    }
+  ],
+  "review_test_claims": [
+    {
+      "id": "unsupported-all-three",
+      "text": "All three partners require Salesforce.",
+      "purpose": "Intentionally unsupported fixture claim for genuine Gemma review; actual sources identify two partners."
+    },
+    {
+      "id": "unsupported-promise",
+      "text": "We promised Kite the custom workflow by Friday.",
+      "purpose": "Intentionally unsupported fixture claim; kite-conversation-2 records evaluation only."
+    }
+  ]
+}

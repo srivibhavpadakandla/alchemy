@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-03",
+  "product": "LaunchGuild V5 local prototype with redesigned UI and verified local Codex execution",
+  "completeV5Acceptance": false,
+  "localUrl": "http://localhost:3210/demo",
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "unitSqlMockedProviderTests": {
+    "passed": 45,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "viewports": [
+    1440,
+    1280,
+    768,
+    390
+  ],
+  "axeRoutes": 6,
+  "axeReportedViolations": 0,
+  "productionAuditReportedVulnerabilities": 0,
+  "actualProviderReceipts": 5,
+  "deployedAuthVerified": false,
+  "publicDeployment": null,
+  "externalBlockers": [
+    "Supabase sign-in/project/configuration",
+    "OpenAI application API model access",
+    "Google Gemma model access",
+    "Inngest service registration and hosted recovery",
+    "ElevenLabs signed agent session"
+  ],
+  "limitsDocument": "KNOWN-LIMITS.md",
+  "footage": "Original MP4s show the previous interface. New screenshots show the redesigned town and real local agent tasks.",
+  "mainMovie": {
+    "seconds": 120,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "teaser": {
+    "seconds": 30,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "narration": "Local macOS Samantha; not ElevenLabs proof",
+  "localCodex": {
+    "validatedRoles": [
+      "Diplomat",
+      "Quartermaster",
+      "Scout",
+      "Smith",
+      "Treasurer"
+    ],
+    "proof": "../artifacts/local-agent-proof.json",
+    "cancellationProof": "../artifacts/local-cancellation-proof.json",
+    "provider": "Local Codex CLI / existing ChatGPT session",
+    "hostedApiVerified": false
+  }
+}

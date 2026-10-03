@@ -1,0 +1,40 @@
+{
+  "author": "Original procedural artwork created for LaunchGuild",
+  "license": "CC0-1.0",
+  "grid": "integer SVG pixel coordinates; nearest-neighbor rendering",
+  "assets": [
+    "forest.svg",
+    "hall.svg",
+    "workshop.svg",
+    "forge.svg",
+    "tower.svg",
+    "shop.svg",
+    "treasury.svg",
+    "agent-0.svg",
+    "agent-1.svg",
+    "agent-2.svg",
+    "agent-3.svg",
+    "agent-4.svg"
+  ],
+  "animation": "HTML working indicators driven by persisted real queued/working tasks; reduced-motion support",
+  "generatedAssets": [
+    {
+      "file": "guild-world.png",
+      "tool": "image_gen.imagegen",
+      "date": "2026-10-03",
+      "provenance": "Original generated pixel village; see docs/REDESIGN.md. Separate from the legacy CC0 SVG assets."
+    },
+    {
+      "file": "office-noir.png",
+      "tool": "image_gen.imagegen",
+      "date": "2026-10-03",
+      "provenance": "Original monochrome artwork for the Optiflux reference direction. See docs/OPTIFLUX-DIRECTION.md. Separate from legacy CC0 assets."
+    },
+    {
+      "file": "team-noir.png",
+      "tool": "image_gen.imagegen",
+      "date": "2026-10-03",
+      "provenance": "Original monochrome artwork for the Optiflux reference direction. See docs/OPTIFLUX-DIRECTION.md. Separate from legacy CC0 assets."
+    }
+  ]
+}
