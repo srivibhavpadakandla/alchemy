@@ -3,12 +3,13 @@ import { StateSchema, State } from "./domain";
 import { DomainError } from "./commands";
 export async function readAsActor(id: string, actor: string) {
   const db = adminClient();
-  const { data: membership } = await db
+  const { data: membership, error: membershipError } = await db
     .from("memberships")
     .select("role")
     .eq("program_id", id)
     .eq("user_id", actor)
-    .single();
+    .maybeSingle();
+  if (membershipError) throw Error("Membership lookup unavailable");
   if (!membership || !["owner", "editor"].includes(membership.role))
     throw new DomainError(
       "Editor or owner role required for provider tasks",
@@ -64,10 +65,11 @@ export async function readAsActor(id: string, actor: string) {
       return [key, (data ?? []).map((r) => r.payload)];
     }),
   );
-  const { data: receipts } = await db
+  const { data: receipts, error: receiptError } = await db
     .from("mutation_receipts")
     .select("key")
     .eq("program_id", id);
+  if (receiptError) throw Error("Mutation receipt lookup unavailable");
   return StateSchema.parse({
     schema: "launchguild-v1",
     id,

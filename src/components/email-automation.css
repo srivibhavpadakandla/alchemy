@@ -1,0 +1,46 @@
+.email-automation {
+  margin: 24px 0;
+}
+.email-automation form > label {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+.email-automation form > label.email-trigger {
+  display: flex;
+}
+.email-automation .email-trigger {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px 0;
+}
+.email-automation .email-trigger input {
+  width: auto;
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+.email-automation fieldset {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 16px;
+}
+.email-automation .email-preview,
+.email-automation .email-history {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.email-automation .email-preview strong,
+.email-automation .email-preview small {
+  display: block;
+  margin-bottom: 10px;
+}
+.email-automation summary {
+  cursor: pointer;
+}
+.email-automation textarea {
+  min-height: 180px;
+}

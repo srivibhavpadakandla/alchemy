@@ -13,6 +13,7 @@ import "./redesign.css";
 import "./optiflux.css";
 import "./alchemy.css";
 import "./cosmos.css";
+import "./video-inspired.css";
 export const metadata: Metadata = {
   title: "Alchemy · Customer trials that prove value.",
   description:

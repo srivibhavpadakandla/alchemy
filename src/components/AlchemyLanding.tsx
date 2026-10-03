@@ -109,6 +109,7 @@ export function AlchemyLanding() {
         <nav aria-label="Website navigation">
           <a href="#how-it-works">How it works</a>
           <a href="#community">Community</a>
+          <Link href="/demo/frontdesk">Frontdesk</Link>
         </nav>
         <form action="/demo" className="cosmos-search">
           <Search size={17} />

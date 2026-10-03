@@ -2,7 +2,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-import { authNext } from "@/lib/auth-next";
+import {
+  authCallbackUrl,
+  authClearReturnCookie,
+  authNext,
+  authReturnCookie,
+} from "@/lib/auth-next";
 import { browserClient } from "@/lib/supabase/browser";
 export default function Login() {
   const [email, setEmail] = useState(""),
@@ -13,12 +18,14 @@ export default function Login() {
   useEffect(() => {
     if (new URLSearchParams(location.search).has("error"))
       setMessage(
-        "This sign-in link is invalid or expired. Request a fresh email code.",
+        "This sign-in link is invalid or expired. Request a fresh sign-in email.",
       );
   }, []);
   const next = () => authNext(new URLSearchParams(location.search).get("next"));
-  const callback = () =>
-    `${location.origin}/auth/callback?next=${encodeURIComponent(next())}`;
+  const callback = () => {
+    document.cookie = authReturnCookie(next(), location.protocol === "https:");
+    return authCallbackUrl(location.origin);
+  };
   const perform = async (fn: () => Promise<void>) => {
     setBusy(true);
     setMessage("");
@@ -58,7 +65,7 @@ export default function Login() {
         >
           <span className="google-icon">G</span> Continue with Google
         </button>
-        <div className="login-divider">or use an email code</div>
+        <div className="login-divider">or sign in by email</div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -70,6 +77,9 @@ export default function Login() {
                   type: "email",
                 });
                 if (error) throw error;
+                document.cookie = authClearReturnCookie(
+                  location.protocol === "https:",
+                );
                 location.assign(next());
               } else {
                 const { error } = await browserClient().auth.signInWithOtp({
@@ -81,7 +91,7 @@ export default function Login() {
                 if (error) throw error;
                 setSent(true);
                 setMessage(
-                  "Check your email for the verified sign-in code. It expires according to your authentication policy.",
+                  "Open the sign-in link in your email, or enter a verification code if one is provided. Links and codes expire according to your authentication policy.",
                 );
               }
             });
@@ -116,7 +126,7 @@ export default function Login() {
               ? "Connecting…"
               : sent
                 ? "Verify code and enter"
-                : "Email me a sign-in code"}{" "}
+                : "Email me a sign-in link or code"}{" "}
             <span>→</span>
           </button>
         </form>
@@ -128,7 +138,7 @@ export default function Login() {
               setCode("");
             }}
           >
-            Use another email / request a new code
+            Use another email / request a fresh sign-in email
           </button>
         )}
         {message && (

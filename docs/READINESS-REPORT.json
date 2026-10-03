@@ -1,31 +1,41 @@
 {
   "date": "2026-10-03",
-  "product": "Alchemy local customer-trial application with Cosmos-inspired design",
+  "product": "Alchemy local customer-trial application with Cosmos-inspired design and Frontdesk onboarding",
   "completeV5Acceptance": false,
   "localUrl": "http://localhost:3210",
   "typecheck": "passed",
   "productionBuild": "passed",
   "unitSqlMockedProviderTests": {
-    "passed": 63,
-    "failed": 0
+    "passed": 157,
+    "failed": 0,
+    "files": 13
   },
   "browserTests": {
-    "passed": 17,
-    "failed": 0
+    "passed": 24,
+    "failed": 0,
+    "focusedFrontdeskPassed": 7,
+    "finalRegressionPending": false,
+    "evidence": "final production regression run passed",
+    "elapsedSeconds": 46
   },
   "viewports": [1440, 1280, 768, 390],
   "axeRoutes": 11,
   "axeReportedViolations": 0,
   "productionAuditReportedVulnerabilities": 0,
-  "actualProviderReceipts": 6,
+  "actualProviderReceipts": 7,
   "deployedAuthVerified": false,
   "publicDeployment": null,
   "externalBlockers": [
-    "Supabase sign-in/project/configuration",
+    "Supabase local app keys and authenticated app sessions",
     "OpenAI application API model access",
     "Google Gemma model access",
     "Inngest service registration and hosted recovery",
-    "ElevenLabs signed agent session"
+    "ElevenLabs signed agent session",
+    "Google Calendar OAuth and intended calendar configuration",
+    "Twilio account and opted-in SMS test destination",
+    "Resend verified sender and reviewed email test destination",
+    "Exact live booking date/time/time zone and chosen recipient details",
+    "Custom SMTP for authentication code template and actual email login delivery"
   ],
   "limitsDocument": "KNOWN-LIMITS.md",
   "footage": "Original MP4s show a previous interface. Current screenshots show the Cosmos-inspired design and actual local agent results.",
@@ -61,10 +71,104 @@
       "validated": true,
       "input": "fictional local records",
       "result": "saved and visible in the app"
+    },
+    "frontdeskExtraction": {
+      "tokens": 29851,
+      "sourceType": "fictional business documents",
+      "validatedFacts": 10,
+      "exactSourceQuotesChecked": true,
+      "ownerCorrectionProvenanceVerified": true,
+      "confirmedBriefPersistedAfterReload": true,
+      "hostedApiVerified": false,
+      "privateReceiptRetained": true,
+      "realPdfParserVerified": true
     }
   },
   "hostedPrivateStorageVerified": false,
   "hostedScheduledJobsVerified": false,
   "twoAccountTrialJourneyVerified": false,
-  "designDocument": "COSMOS-DESIGN.md"
+  "designDocument": "COSMOS-DESIGN.md",
+  "providerActions": {
+    "liveTestsAuthorized": true,
+    "externalActionsExecuted": false,
+    "googleCalendarVerified": false,
+    "twilioSmsDelivered": false,
+    "resendEmailDelivered": false,
+    "inboundPhoneVerified": false,
+    "authorizationRequiresExactTestDestinations": true
+  },
+  "configurationPresence": {
+    "supabase": false,
+    "openaiApi": false,
+    "gemma": false,
+    "elevenlabs": false,
+    "inngest": false,
+    "googleCalendar": false,
+    "twilio": false,
+    "resend": false,
+    "localCodex": true,
+    "supabaseUrl": true,
+    "supabasePublishableKey": false,
+    "supabaseServiceKey": false
+  },
+  "providerTestPlan": "PROVIDER-TEST-PLAN.md",
+  "supabaseDashboard": {
+    "signedIn": true,
+    "separateAlchemyProjectCreated": true,
+    "infrastructureHealthy": true,
+    "applicationAuthenticationVerified": false,
+    "termsApprovalCompleted": true,
+    "alchemyOnlyConfigurationAuthorized": true,
+    "hostedMigrationsApplied": "001–009",
+    "hostedSchemaStructuralChecksVerified": true,
+    "rlsTablesVerified": 32,
+    "readPoliciesVerified": 32,
+    "functionGrantChecksVerified": 13,
+    "noAnonymousTableAccess": true,
+    "noDirectAuthenticatedTableWrites": true,
+    "emailRetryClosureIndexesVerified": 2,
+    "bookingLeaseAndServiceSequencingVerified": true,
+    "privateBucketConfigurationVerified": true,
+    "privateBucketMaxBytes": 5242880,
+    "privateBucketAllowedMimeTypes": [
+      "application/pdf",
+      "image/png",
+      "image/jpeg"
+    ],
+    "privateApplicationFileTransferVerified": false,
+    "siteUrl": "http://localhost:3210",
+    "allowedRedirectUrls": ["http://localhost:3210/auth/callback"],
+    "authUrlConfigurationVerified": true,
+    "currentEmailTemplate": "default magic link",
+    "emailCodeTemplateConfigured": false,
+    "emailCodeTemplateBlocker": "Custom SMTP required to edit templates in current project",
+    "magicLinkPkceCallbackImplemented": true,
+    "loginCopySupportsLinkOrCode": true,
+    "exactCallbackRoutingImplemented": true,
+    "localReturnCookie": {
+      "sameSite": "Lax",
+      "path": "/auth/callback",
+      "maxAgeSeconds": 600,
+      "secureOnHttps": true,
+      "clearedOnCallbackSuccessOrFailure": true,
+      "clearedOnCodeVerificationSuccess": true
+    },
+    "failedAuthRetryPreservesSanitizedLocalReturn": true
+  },
+  "additionalAuthRoutingTests": {
+    "passed": 4,
+    "failed": 0,
+    "fullSuiteRerunPending": false,
+    "includedInFullSuite": true
+  },
+  "emailDeliveryReceipts": {
+    "signedWebhooksImplemented": true,
+    "signatureAndTimestampVerifiedLocally": true,
+    "matchesSavedProviderSenderAndRecipient": true,
+    "sendOnlyModeSupported": true,
+    "webhookDisablesApiPolling": true,
+    "apiPollingOtherwiseRequiresReadAccess": true,
+    "actualProviderWebhookReceived": false,
+    "actualEmailDeliveryVerified": false
+  }
 }

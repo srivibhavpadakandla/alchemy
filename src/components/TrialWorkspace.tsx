@@ -15,6 +15,7 @@ import { SourceEditor } from "./PartnerPanel";
 import { CommercialRecord } from "./CommercialRecord";
 import { TrialReminders } from "./TrialReminders";
 import { PrivateAttachments } from "./PrivateAttachments";
+import { EmailAutomationPanel } from "./EmailAutomationPanel";
 import {
   TrialPlan,
   TrialPlanSchema,
@@ -357,6 +358,7 @@ export function TrialWorkspace({
               {section === "tasks" && state.mode === "live" && (
                 <TrialReminders programId={state.id} partnerId={customer.id} />
               )}
+              {section === "tasks" && <EmailAutomationPanel key={customer.id} partnerId={customer.id} />}
               {section === "metrics" && (
                 <PrivateAttachments partnerId={customer.id} />
               )}

@@ -6,7 +6,7 @@ LaunchGuild now applies that direction to its landing page, login, overview and 
 
 ## Original artwork
 
-Both images were generated with `image_gen.imagegen` on October 3, 2026. No source-site images, logos, code or fonts were copied. The generated images are separate from the old procedural CC0 artwork. Original generation files remain under `/Users/srivibhavp/.codex/generated_images/01a10310-04b1-7e90-8b6e-8f98c81d768b/`.
+Both images were generated with `image_gen.imagegen` on October 3, 2026. No source-site images, logos, code or fonts were copied. The generated images are separate from the old procedural CC0 artwork. Original generation files remain under `/Users/srivibhavp/.codex/generated_images/[private local receipt retained outside source]/`.
 
 - Office: `public/art/office-noir.png`, original `exec-32d46364-28af-4280-9628-98a841c845e3.png`.
 - Team: `public/art/team-noir.png`, original `exec-80bc372e-8aa6-49d7-b26a-20a80f2eec8c.png`.

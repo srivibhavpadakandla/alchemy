@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authNext } from "@/lib/auth-next";
+import {
+  AUTH_CALLBACK_PATH,
+  AUTH_RETURN_COOKIE,
+  authCallbackReturn,
+  authRetryUrl,
+} from "@/lib/auth-next";
 import { serverClient } from "@/lib/supabase/server";
 export async function GET(req: NextRequest) {
+  const returnPath = authCallbackReturn(
+    req.cookies.get(AUTH_RETURN_COOKIE)?.value,
+    req.nextUrl.searchParams.get("next"),
+  );
+  let response: NextResponse;
   try {
     const code = req.nextUrl.searchParams.get("code");
     if (!code) throw Error("Missing authorization code");
@@ -9,12 +19,15 @@ export async function GET(req: NextRequest) {
       await serverClient()
     ).auth.exchangeCodeForSession(code);
     if (error) throw error;
-    return NextResponse.redirect(
-      new URL(authNext(req.nextUrl.searchParams.get("next")), req.url),
-    );
+    response = NextResponse.redirect(new URL(returnPath, req.url));
   } catch {
-    return NextResponse.redirect(
-      new URL("/login?error=invalid-or-expired", req.url),
-    );
+    response = NextResponse.redirect(authRetryUrl(req.url, returnPath));
   }
+  response.cookies.set(AUTH_RETURN_COOKIE, "", {
+    path: AUTH_CALLBACK_PATH,
+    maxAge: 0,
+    sameSite: "lax",
+    secure: req.nextUrl.protocol === "https:",
+  });
+  return response;
 }

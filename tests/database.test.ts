@@ -19,6 +19,8 @@ beforeAll(async () => {
     "004_cancel_job.sql",
     "005_alchemy_trials.sql",
     "006_private_attachments.sql",
+    "007_frontdesk_bookings.sql",
+    "008_trial_email.sql",
   ])
     await db.exec(readFileSync("supabase/migrations/" + migration, "utf8"));
   await db.exec(
@@ -467,4 +469,61 @@ it("customer task updates enforce current plan, side, source and version before 
       )
     ).rows[0].version,
   ).toBe(4);
+});
+
+it("booking reservation deduplicates input, protects appointments and denies unrelated actors", async () => {
+  await db.exec(
+    `select set_config('request.jwt.claim.role','service_role',false); select set_config('request.jwt.claim.sub','${owner}',false);`,
+  );
+  const key = "11111111-1111-4111-8111-111111111111";
+  const start = new Date(Date.now() + 7 * 86400000).toISOString(),
+    end = new Date(Date.parse(start) + 30 * 60000).toISOString();
+  const args = [owner, "p", owner, key, "same-input", start, end];
+  const first = await db.query<{
+    reserve_frontdesk_booking: { acquired: boolean };
+  }>("select reserve_frontdesk_booking($1,$2,$3,$4,$5,$6,$7)", args);
+  expect(first.rows[0].reserve_frontdesk_booking.acquired).toBe(true);
+  const second = await db.query<{
+    reserve_frontdesk_booking: { acquired: boolean };
+  }>("select reserve_frontdesk_booking($1,$2,$3,$4,$5,$6,$7)", args);
+  expect(second.rows[0].reserve_frontdesk_booking.acquired).toBe(false);
+  await expect(
+    db.query("select reserve_frontdesk_booking($1,$2,$3,$4,$5,$6,$7)", [
+      owner,
+      "p",
+      owner,
+      key,
+      "changed-input",
+      start,
+      end,
+    ]),
+  ).rejects.toThrow("different");
+  await expect(
+    db.query("select reserve_frontdesk_booking($1,$2,$3,$4,$5,$6,$7)", [
+      owner,
+      "p",
+      owner,
+      "22222222-2222-4222-8222-222222222222",
+      "new-input",
+      start,
+      end,
+    ]),
+  ).rejects.toThrow("overlaps");
+  await expect(
+    db.query("select reserve_frontdesk_booking($1,$2,$3,$4,$5,$6,$7)", [
+      owner,
+      "p",
+      "00000000-0000-4000-8000-000000000003",
+      "33333333-3333-4333-8333-333333333333",
+      "foreign",
+      start,
+      end,
+    ]),
+  ).rejects.toThrow("access");
+  await db.exec(
+    `set role authenticated; select set_config('request.jwt.claim.role','authenticated',false); select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000003',false)`,
+  );
+  const hidden = await db.query("select * from frontdesk_bookings");
+  expect(hidden.rows).toHaveLength(0);
+  await db.exec("reset role");
 });

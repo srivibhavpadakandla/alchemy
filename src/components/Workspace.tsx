@@ -41,6 +41,7 @@ import {
 import { Command } from "@/lib/commands";
 import { readDemo, mutateDemo, subscribeDemo } from "@/lib/demo-store";
 import { TrialWorkspace } from "./TrialWorkspace";
+import { Frontdesk } from "./video-inspired/Frontdesk";
 import { Capacity } from "./Capacity";
 import { PartnerPanel, PartnerEditor } from "./PartnerPanel";
 import {
@@ -344,6 +345,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
           <div className="alchemy-tools">
             <span>SUPPORTING TOOLS</span>
             <Link href={`${base}/agents`}>Agents</Link>
+            <Link href={`${base}/frontdesk`}>Frontdesk</Link>
             <Link href={`${base}/capacity`}>Capacity</Link>
             <Link href={`${base}/evidence`}>Evidence</Link>
             <Link href={`${base}/partners`}>Customer records</Link>
@@ -364,6 +366,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
                     offer: "A clear commercial decision.",
                     town: "From interest to evidence.",
                     agents: "Good work starts with evidence.",
+                    frontdesk: "Every conversation has a next step.",
                     partners: "Your first five.",
                     requests: "One product. Shared progress.",
                     capacity: "Choose what you build next.",
@@ -399,6 +402,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
             />
           )}
           {section === "agents" && <AgentWorkspace />}
+          {section === "frontdesk" && <Frontdesk />}
           {section === "partners" &&
             (selectedPartner ? (
               <PartnerPanel partner={selectedPartner} />
