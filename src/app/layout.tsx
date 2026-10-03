@@ -11,10 +11,12 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "./globals.css";
 import "./redesign.css";
 import "./optiflux.css";
+import "./alchemy.css";
+import "./cosmos.css";
 export const metadata: Metadata = {
-  title: "LaunchGuild · Build one product. Grow together.",
+  title: "Alchemy · Customer trials that prove value.",
   description:
-    "Turn your first design partners into customers without building five different products.",
+    "Agree on the trial. Track the work. Prove the value. Make a clear commercial decision.",
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

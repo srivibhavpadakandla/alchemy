@@ -1,0 +1,6 @@
+-- Supabase Storage is required for this migration. The bucket is never public.
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('alchemy-evidence','alchemy-evidence',false,5242880,array['application/pdf','image/png','image/jpeg']) on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
+create table public.trial_attachments(id uuid primary key,program_id text not null references programs on delete cascade,partner_id text not null,source_id text not null,object_path text unique not null,filename text not null,mime_type text not null,size_bytes integer not null check(size_bytes>0 and size_bytes<=5242880),sha256 text not null,uploaded_by uuid not null references auth.users,created_at timestamptz not null default now());
+alter table public.trial_attachments enable row level security;
+create policy private_attachment_read on public.trial_attachments for select to authenticated using(public.can_read(program_id) or exists(select 1 from memberships where program_id=trial_attachments.program_id and user_id=auth.uid() and role='customer' and partner_id=trial_attachments.partner_id));
+-- Browser access goes through the scoped server route; no broad storage.objects policies are granted.

@@ -45,7 +45,8 @@ test("founder compares, commits, refreshes and sees one decision without a sale"
   await page.reload();
   await expect(page.locator(".decision-history")).toHaveCount(1);
   await page.goto("/demo");
-  await expect(page.locator(".hud")).toContainText("$0");
+  await expect(page.locator(".hud")).toContainText("PAYMENT RECEIPTS");
+  await expect(page.locator(".hud > div").last()).toContainText("0");
   await expect(
     page.locator(".partner-card").filter({ hasText: "Northstar Logistics" }),
   ).toContainText("active pilot");
@@ -135,7 +136,7 @@ test("voice opens safely, text tools retrieve sources, unavailable provider leav
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/demo");
-  await page.getByRole("button", { name: "Ask the guild" }).click();
+  await page.getByRole("button", { name: "Ask Alchemy" }).click();
   await expect(page.getByRole("dialog")).toContainText("Microphone off");
   await page
     .getByRole("button", { name: "What blocks Juniper becoming paid?" })

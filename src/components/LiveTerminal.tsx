@@ -76,7 +76,7 @@ export function LiveTerminal({
           <>
             <div>
               <span className="terminal-chevron">&gt;</span>
-              <span>Welcome to LaunchGuild</span>
+              <span>Welcome to Alchemy</span>
             </div>
             <div>
               <span className="terminal-chevron">&gt;</span>

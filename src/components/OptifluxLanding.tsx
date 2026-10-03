@@ -37,7 +37,7 @@ export function OptifluxLanding() {
         <div className="cinema-shade" />
         <header className="editorial-masthead">
           <Link href="/" className="editorial-wordmark">
-            LaunchGuild
+            Alchemy
           </Link>
           <Link href="/login" className="editorial-signin">
             SIGN IN <ArrowUpRight size={13} />
@@ -74,7 +74,7 @@ export function OptifluxLanding() {
             Decisions that cannot wait.
           </p>
           <p>
-            LaunchGuild is your second set of eyes.
+            Alchemy is your second set of eyes.
             <br />
             Five specialists. A shared direction.
           </p>
@@ -142,7 +142,7 @@ export function OptifluxLanding() {
           <em>A bigger beginning.</em>
         </h2>
         <Link className="metal-button" href="/demo">
-          ENTER LAUNCHGUILD
+          ENTER ALCHEMY
         </Link>
         <p>
           Explore the workspace with three fictional partners.
@@ -152,7 +152,7 @@ export function OptifluxLanding() {
       </section>
       <footer className="editorial-footer">
         <Link className="editorial-wordmark" href="/">
-          LaunchGuild
+          Alchemy
         </Link>
         <div>
           <Link href="/demo">WORKSPACE</Link>

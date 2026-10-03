@@ -1,5 +1,12 @@
 import { z } from "zod";
 import {
+  TrialPlanSchema,
+  TrialTaskSchema,
+  TrialMeasurementSchema,
+  TrialDecisionSchema,
+  trialResult,
+} from "./trials";
+import {
   State,
   StateSchema,
   PartnerSchema,
@@ -16,12 +23,45 @@ import {
   calculate,
   inputHash,
   hash,
+  newPartner,
 } from "./domain";
 const base = {
   key: z.string().min(1).max(100),
   expectedVersion: z.number().int().positive(),
 };
 export const CommandSchema = z.discriminatedUnion("type", [
+  z.object({
+    ...base,
+    type: z.literal("trial.evaluate"),
+    trialId: z.string().min(1),
+  }),
+  z.object({
+    ...base,
+    type: z.literal("customer.add"),
+    id: z.string().min(1).max(80),
+    name: z.string().min(1).max(160),
+    needs: z.string().min(5).max(20000),
+  }),
+  z.object({
+    ...base,
+    type: z.literal("trial.plan.add"),
+    plan: TrialPlanSchema,
+  }),
+  z.object({
+    ...base,
+    type: z.literal("trial.task.save"),
+    task: TrialTaskSchema,
+  }),
+  z.object({
+    ...base,
+    type: z.literal("trial.measurement.add"),
+    measurement: TrialMeasurementSchema,
+  }),
+  z.object({
+    ...base,
+    type: z.literal("trial.decision.add"),
+    decision: TrialDecisionSchema,
+  }),
   z.object({
     ...base,
     type: z.literal("partner.save"),
@@ -167,6 +207,182 @@ export function applyCommand(
     else list[i] = value;
   };
   switch (c.type) {
+    case "trial.evaluate": {
+      const plan = s.trialPlans.filter((p) => p.trialId === c.trialId).at(-1);
+      assert(plan, "Trial not found");
+      assert(plan.end <= now.slice(0, 10), "The scheduled trial has not ended");
+      break;
+    }
+    case "customer.add": {
+      assert(
+        !s.partners.some((p) => p.id === c.id),
+        "Customer already exists",
+        409,
+      );
+      const customer = newPartner(c.id, c.name);
+      customer.problem = c.needs;
+      s.partners.push(customer);
+      s.sources.push({
+        id: `${c.id}-needs`,
+        partnerId: c.id,
+        version: 1,
+        kind: "reported note",
+        title: "Customer conversation notes",
+        content: c.needs,
+        author: actor,
+        occurredAt: now.slice(0, 10),
+        recordedAt: now,
+        hash: hash(c.needs),
+        scope: "program members",
+        quoteStart: 0,
+        quoteEnd: c.needs.length,
+      });
+      break;
+    }
+    case "trial.plan.add": {
+      const p = c.plan;
+      partner(p.partnerId);
+      source(p.needsSourceId, p.partnerId);
+      if (p.metric.baselineSourceId)
+        source(p.metric.baselineSourceId, p.partnerId);
+      assert(p.end >= p.start, "Trial end precedes start");
+      assert(
+        !s.trialPlans.some((x) => x.id === p.id),
+        "Plan versions are immutable",
+      );
+      const previous = s.trialPlans
+        .filter((x) => x.trialId === p.trialId)
+        .at(-1);
+      assert(
+        previous
+          ? p.previousId === previous.id &&
+              p.version === previous.version + 1 &&
+              p.partnerId === previous.partnerId
+          : p.version === 1 && !p.previousId,
+        "Review the latest plan version before amending",
+        409,
+      );
+      if (previous)
+        assert(
+          p.start >= previous.start &&
+            p.createdAt.slice(0, 10) >= previous.createdAt.slice(0, 10),
+          "Plan amendment cannot be backdated",
+        );
+      for (const approval of [
+        p.founderApprovalSourceId,
+        p.customerApprovalSourceId,
+      ])
+        if (approval) source(approval, p.partnerId);
+      if (p.customerApprovalSourceId) {
+        const acknowledgment = source(p.customerApprovalSourceId, p.partnerId);
+        assert(
+          acknowledgment.kind === "direct acknowledgment" ||
+            (s.mode === "demo" && acknowledgment.kind === "fixture"),
+          "Customer review requires direct acknowledgment evidence",
+        );
+      }
+      if (
+        previous &&
+        (p.founderApprovalSourceId || p.customerApprovalSourceId)
+      ) {
+        const terms = (x: typeof p) => ({
+          ...x,
+          id: "",
+          version: 0,
+          previousId: "",
+          founderApprovalSourceId: "",
+          customerApprovalSourceId: "",
+          createdAt: "",
+        });
+        assert(
+          hash(terms(p)) === hash(terms(previous)),
+          "Changed terms require a fresh review from both sides",
+        );
+      }
+      s.trialPlans.push(p);
+      break;
+    }
+    case "trial.task.save": {
+      const t = c.task;
+      partner(t.partnerId);
+      const plan = s.trialPlans
+        .filter((p) => p.trialId === t.trialId && p.partnerId === t.partnerId)
+        .at(-1);
+      assert(
+        plan && plan.version === t.planVersion,
+        "Task references an outdated plan",
+        409,
+      );
+      const old = s.trialTasks.find((x) => x.id === t.id);
+      assert(
+        !old ||
+          (old.version === t.version &&
+            old.partnerId === t.partnerId &&
+            old.trialId === t.trialId),
+        "Task changed or belongs to another customer",
+        409,
+      );
+      if (t.status === "done") source(t.completionSourceId, t.partnerId);
+      if (t.status === "blocked")
+        assert(t.blocker.trim().length >= 5, "Explain what blocks this task");
+      upsert(s.trialTasks, { ...t, version: (old?.version ?? 0) + 1 });
+      break;
+    }
+    case "trial.measurement.add": {
+      const m = c.measurement;
+      partner(m.partnerId);
+      source(m.sourceId, m.partnerId);
+      assert(
+        s.trialPlans.some(
+          (p) =>
+            p.trialId === m.trialId &&
+            p.partnerId === m.partnerId &&
+            p.version === m.planVersion,
+        ),
+        "Measurement plan missing",
+      );
+      assert(
+        !s.trialMeasurements.some((x) => x.id === m.id),
+        "Measurements are immutable",
+      );
+      const days =
+        (Date.parse(m.measuredEnd) - Date.parse(m.measuredStart)) / 86400000 +
+        1;
+      assert(
+        m.measuredEnd >= m.measuredStart && days === m.periodDays,
+        "Measurement dates must match its period length",
+      );
+      assert(
+        m.validUntil >= m.measuredEnd,
+        "Freshness date precedes the measurement",
+      );
+      assert(
+        s.mode === "demo" || m.measuredEnd <= now.slice(0, 10),
+        "Cannot report future measurements",
+      );
+      s.trialMeasurements.push(m);
+      break;
+    }
+    case "trial.decision.add": {
+      const d = c.decision;
+      partner(d.partnerId);
+      source(d.sourceId, d.partnerId);
+      assert(
+        s.trialPlans.some(
+          (p) =>
+            p.trialId === d.trialId &&
+            p.partnerId === d.partnerId &&
+            p.version === d.planVersion,
+        ),
+        "Decision plan missing",
+      );
+      assert(
+        !s.trialDecisions.some((x) => x.id === d.id),
+        "Decisions are immutable",
+      );
+      s.trialDecisions.push(d);
+      break;
+    }
     case "partner.save": {
       const old = s.partners.find((p) => p.id === c.partner.id);
       assert(
@@ -750,6 +966,104 @@ export function applyCommand(
       (mustHave ? p.requiredWork : p.optionalWork).push(target.id);
       p.version++;
       break;
+    }
+  }
+  if (
+    ["trial.measurement.add", "trial.evaluate", "trial.plan.add"].includes(
+      c.type,
+    )
+  ) {
+    const trialId =
+      c.type === "trial.measurement.add"
+        ? c.measurement.trialId
+        : c.type === "trial.evaluate"
+          ? c.trialId
+          : c.type === "trial.plan.add"
+            ? c.plan.trialId
+            : "";
+    const plan = s.trialPlans.filter((p) => p.trialId === trialId).at(-1);
+    if (
+      plan &&
+      (c.type !== "trial.plan.add" ||
+        (plan.founderApprovalSourceId && plan.customerApprovalSourceId))
+    ) {
+      const result = trialResult(plan, s.trialMeasurements, now.slice(0, 10));
+      const trigger =
+        c.type === "trial.measurement.add"
+          ? "measurement.recorded"
+          : c.type === "trial.evaluate"
+            ? "trial.ended"
+            : "plan.reviewed";
+      const taskId = `action-${c.key}`,
+        reportId = trigger === "plan.reviewed" ? "" : `report-${c.key}`;
+      s.trialTasks.push({
+        id: taskId,
+        trialId,
+        partnerId: plan.partnerId,
+        planVersion: plan.version,
+        version: 1,
+        title:
+          trigger === "plan.reviewed"
+            ? "Schedule trial kickoff with customer"
+            : result.reasons.length
+              ? "Resolve missing or incomparable trial evidence"
+              : "Review results and paid offer with the customer",
+        owner: "startup",
+        assignee: partner(plan.partnerId).owner,
+        due: now.slice(0, 10),
+        status: "planned",
+        blocker: result.reasons.join(" "),
+        completionSourceId: "",
+      });
+      if (reportId)
+        s.trialReports.push({
+          id: reportId,
+          trialId,
+          partnerId: plan.partnerId,
+          planId: plan.id,
+          planVersion: plan.version,
+          inputHash: hash({
+            plan,
+            measurements: s.trialMeasurements.filter(
+              (m) => m.trialId === trialId,
+            ),
+            sourceHashes: s.sources
+              .filter((src) => src.partnerId === plan.partnerId)
+              .map((src) => ({ id: src.id, hash: src.hash })),
+          }),
+          sourceIds: [
+            ...new Set(
+              [
+                plan.needsSourceId,
+                plan.metric.baselineSourceId,
+                plan.founderApprovalSourceId,
+                plan.customerApprovalSourceId,
+                result.observation?.sourceId,
+              ].filter((x): x is string => !!x),
+            ),
+          ],
+          status: result.status,
+          baseline: plan.metric.baseline,
+          value: result.observation?.value ?? null,
+          change: result.change,
+          targetMet: result.targetMet,
+          gaps: result.reasons,
+          createdAt: now,
+          limits:
+            "Manually reported evidence. No causal attribution, realized savings, customer acceptance or payment is inferred.",
+        });
+      s.trialEvents.push({
+        id: c.key,
+        trialId,
+        partnerId: plan.partnerId,
+        trigger,
+        status: "succeeded",
+        actor,
+        at: now,
+        taskId,
+        reportId,
+        summary: `${trigger}: created next-action task${reportId ? " and pinned results report" : ""}. No commercial status changed.`,
+      });
     }
   }
   if (inputHash(s) !== before && c.type !== "plan.commit")

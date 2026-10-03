@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+import { authNext } from "@/lib/auth-next";
 import { browserClient } from "@/lib/supabase/browser";
 export default function Login() {
   const [email, setEmail] = useState(""),
@@ -15,6 +16,9 @@ export default function Login() {
         "This sign-in link is invalid or expired. Request a fresh email code.",
       );
   }, []);
+  const next = () => authNext(new URLSearchParams(location.search).get("next"));
+  const callback = () =>
+    `${location.origin}/auth/callback?next=${encodeURIComponent(next())}`;
   const perform = async (fn: () => Promise<void>) => {
     setBusy(true);
     setMessage("");
@@ -28,18 +32,17 @@ export default function Login() {
   };
   return (
     <main className="login-page">
-      <img className="login-office" src="/art/office-noir.png" alt="" />
       <Link className="brand" href="/">
-        LaunchGuild
+        Alchemy
       </Link>
       <section className="login-card">
         <span className="eyebrow">YOUR NEXT CHAPTER</span>
         <h1>
           Welcome to
           <br />
-          LaunchGuild.
+          Alchemy.
         </h1>
-        <p>One shared direction for your first design partners.</p>
+        <p>A shared plan for your next customer trial.</p>
         <button
           className="button"
           disabled={busy}
@@ -47,7 +50,7 @@ export default function Login() {
             void perform(async () => {
               const { error } = await browserClient().auth.signInWithOAuth({
                 provider: "google",
-                options: { redirectTo: `${location.origin}/auth/callback` },
+                options: { redirectTo: callback() },
               });
               if (error) throw error;
             })
@@ -67,12 +70,12 @@ export default function Login() {
                   type: "email",
                 });
                 if (error) throw error;
-                location.assign("/app");
+                location.assign(next());
               } else {
                 const { error } = await browserClient().auth.signInWithOtp({
                   email,
                   options: {
-                    emailRedirectTo: `${location.origin}/auth/callback`,
+                    emailRedirectTo: callback(),
                   },
                 });
                 if (error) throw error;

@@ -1,4 +1,4 @@
-import { OptifluxLanding } from "@/components/OptifluxLanding";
+import { AlchemyLanding } from "@/components/AlchemyLanding";
 export default function Landing() {
-  return <OptifluxLanding />;
+  return <AlchemyLanding />;
 }

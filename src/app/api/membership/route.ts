@@ -12,7 +12,8 @@ export async function POST(req: Request) {
         action: z.enum(["invite", "accept", "revoke", "delete"]),
         programId: z.string().optional(),
         email: z.email().optional(),
-        role: z.enum(["editor", "viewer"]).optional(),
+        role: z.enum(["editor", "viewer", "customer"]).optional(),
+        partnerId: z.string().optional(),
         token: z.string().optional(),
         userId: z.string().optional(),
         confirmation: z.string().optional(),
@@ -23,6 +24,14 @@ export async function POST(req: Request) {
     if (b.action === "accept") {
       if (!user.email_confirmed_at || !user.email)
         throw new DomainError("Verified email required", 403);
+      const tokenHash = createHash("sha256")
+        .update(b.token ?? "")
+        .digest("hex");
+      const { data: invitation } = await admin
+        .from("invitations")
+        .select("role,partner_id")
+        .eq("token_hash", tokenHash)
+        .single();
       const { data, error } = await admin.rpc("accept_invitation", {
         p_hash: createHash("sha256")
           .update(b.token ?? "")
@@ -31,7 +40,11 @@ export async function POST(req: Request) {
         p_email: user.email,
       });
       if (error) throw error;
-      return Response.json({ programId: data });
+      return Response.json({
+        programId: data,
+        partnerId:
+          invitation?.role === "customer" ? invitation.partner_id : null,
+      });
     }
     const { state, client } = await loadProgram(b.programId ?? "default");
     const { data } = await client
@@ -65,18 +78,22 @@ export async function POST(req: Request) {
       return Response.json({ revoked: true });
     }
     if (!b.email || !b.role) throw Error("Email and role required");
+    if (
+      b.role === "customer" &&
+      !state.partners.some((p) => p.id === b.partnerId)
+    )
+      throw new DomainError("Select a customer in this workspace", 400);
     const token = randomBytes(32).toString("base64url");
-    const { error } = await admin
-      .from("invitations")
-      .insert({
-        id: crypto.randomUUID(),
-        program_id: state.id,
-        invited_email: b.email.toLowerCase(),
-        role: b.role,
-        token_hash: createHash("sha256").update(token).digest("hex"),
-        expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
-        created_by: user.id,
-      });
+    const { error } = await admin.from("invitations").insert({
+      id: crypto.randomUUID(),
+      program_id: state.id,
+      invited_email: b.email.toLowerCase(),
+      role: b.role,
+      partner_id: b.role === "customer" ? b.partnerId : null,
+      token_hash: createHash("sha256").update(token).digest("hex"),
+      expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+      created_by: user.id,
+    });
     if (error) throw error;
     return Response.json({
       url: `${new URL(req.url).origin}/invite/${token}`,

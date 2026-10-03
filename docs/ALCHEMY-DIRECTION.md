@@ -58,3 +58,7 @@ Validate desktop/390px mobile, keyboard navigation, reduced motion, contrast, im
 ## Repository status
 
 This initial private repository is the current implementation baseline and direction. It excludes real credentials, local agent session/job files, generated exports, recordings, dependencies and build outputs. The main implementation chat owns application migration and production verification. This checklist does not claim those gates are already delivered.
+
+## Latest visual direction
+
+The user's subsequent October 3 instruction chose https://www.cosmos.so/ as the visual reference. The implementation now uses a light photographic canvas, floating original images, centered sans-serif typography and rounded controls across the landing page, customer board, trial pages and login. The product scope and release gates above remain applicable. See `COSMOS-DESIGN.md` for provenance and `PROGRESS.md` for current verification.

@@ -40,7 +40,7 @@ import {
 } from "@/lib/domain";
 import { Command } from "@/lib/commands";
 import { readDemo, mutateDemo, subscribeDemo } from "@/lib/demo-store";
-import { Town } from "./Town";
+import { TrialWorkspace } from "./TrialWorkspace";
 import { Capacity } from "./Capacity";
 import { PartnerPanel, PartnerEditor } from "./PartnerPanel";
 import {
@@ -167,8 +167,8 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
   const base = mode === "demo" ? "/demo" : `/app/programs/${programId}`;
   const section =
     mode === "demo"
-      ? pathname.split("/")[2] || "town"
-      : pathname.split("/")[4] || "town";
+      ? pathname.split("/")[2] || "pilots"
+      : pathname.split("/")[4] || "pilots";
   const partnerId =
     mode === "demo" ? pathname.split("/")[3] : pathname.split("/")[5];
   const refresh = useCallback(async () => {
@@ -220,12 +220,12 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
   if (!state)
     return (
       <main className="loading-screen">
-        <Link className="brand" href="/" aria-label="LaunchGuild home">
-          LAUNCHGUILD
+        <Link className="brand" href="/" aria-label="Alchemy home">
+          ALCHEMY
         </Link>
         {error ? (
           <>
-            <h1>Your guild needs a connection.</h1>
+            <h1>Your workspace needs a connection.</h1>
             <p>{error}</p>
             <div className="inline">
               <button className="button primary" onClick={() => void refresh()}>
@@ -242,20 +242,19 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
         ) : (
           <>
             <LoaderCircle className="spin" />
-            <p>Opening the guild records…</p>
+            <p>Opening trial records…</p>
           </>
         )}
       </main>
     );
   const selectedPartner = state.partners.find((p) => p.id === partnerId);
   const nav = [
-    ["town", "Overview", Map],
-    ["partners", "Partners", Building2],
-    ["agents", "Agents", Bot],
-    ["requests", "Shared work", GitBranch],
-    ["capacity", "Capacity", Scale],
-    ["decisions", "Decisions", ScrollText],
-    ["evidence", "Evidence", BookOpen],
+    ["pilots", "Customers & pilots", Building2],
+    ["plan", "Trial Plan", ScrollText],
+    ["tasks", "Tasks", Map],
+    ["metrics", "Metrics", Scale],
+    ["results", "Results", BookOpen],
+    ["offer", "Paid Offer", ArrowUpRight],
     ["settings", "Settings", Settings],
   ] as const;
   return (
@@ -271,21 +270,21 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
       }}
     >
       <div className="app-shell">
-        <LiveTerminal state={state} compact />
+        {section === "agents" && <LiveTerminal state={state} compact />}
         <aside className="sidebar">
-          <Link className="brand" href="/" aria-label="LaunchGuild home">
-            <span className="brand-icon">L</span>
-            <span>LaunchGuild</span>
+          <Link className="brand" href="/" aria-label="Alchemy home">
+            <span className="brand-icon">✳</span>
+            <span>Alchemy</span>
           </Link>
-          <div className="workspace-label">YOUR GUILD</div>
+          <div className="workspace-label">YOUR WORKSPACE</div>
           <button
             className="program-switch"
             onClick={() => router.push(`${base}/settings`)}
           >
-            <span className="program-icon">R</span>
+            <span className="program-icon">{state.name.slice(0, 1)}</span>
             <span>
               {state.name}
-              <small>Design partner program</small>
+              <small>Customer trials</small>
             </span>
             <ChevronRight size={14} />
           </button>
@@ -295,24 +294,20 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
                 key={id}
                 aria-label={label}
                 title={label}
-                href={id === "town" ? base : `${base}/${id}`}
+                href={
+                  id === "pilots"
+                    ? base
+                    : `${base}/${id}${partnerId && id !== "settings" ? `/${partnerId}` : ""}`
+                }
                 className={section === id ? "active" : ""}
               >
                 <Icon size={19} />
                 <span>{label}</span>
-                {id === "partners" && <small>{state.partners.length}</small>}
+                {id === "pilots" && <small>{state.partners.length}</small>}
               </Link>
             ))}
           </nav>
           <div className="sidebar-bottom">
-            <div className="guild-mini">
-              <img src="/art/agent-3.svg" alt="" />
-              <p>
-                Build one product.
-                <br />
-                <strong>Grow together.</strong>
-              </p>
-            </div>
             <Link
               href={mode === "demo" ? "/login" : `${base}/settings`}
               className="profile"
@@ -338,13 +333,20 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
             </span>
             <p>
               {mode === "demo"
-                ? "FICTIONAL RECORDS / REAL MODEL ANALYSIS"
+                ? "FICTIONAL RECORDS / SOURCED RESULTS"
                 : "Private partner records · scoped to this program"}
             </p>
             <Link href={mode === "demo" ? "/app" : "/demo"}>
               {mode === "demo" ? "Go to live records" : "Open demo"}{" "}
               <ArrowUpRight size={13} />
             </Link>
+          </div>
+          <div className="alchemy-tools">
+            <span>SUPPORTING TOOLS</span>
+            <Link href={`${base}/agents`}>Agents</Link>
+            <Link href={`${base}/capacity`}>Capacity</Link>
+            <Link href={`${base}/evidence`}>Evidence</Link>
+            <Link href={`${base}/partners`}>Customer records</Link>
           </div>
           <header className="topbar">
             <div>
@@ -354,27 +356,47 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
               <h1>
                 {(
                   {
-                    town: "Welcome to your next chapter.",
+                    pilots: "From interest to evidence.",
+                    plan: "The trial plan.",
+                    tasks: "Work, with an owner.",
+                    metrics: "Measure the difference.",
+                    results: "Show the value.",
+                    offer: "A clear commercial decision.",
+                    town: "From interest to evidence.",
                     agents: "Good work starts with evidence.",
                     partners: "Your first five.",
                     requests: "One product. Shared progress.",
                     capacity: "Choose what you build next.",
                     decisions: "Decisions with a paper trail.",
                     evidence: "Show your work.",
-                    settings: "Your guild, your boundaries.",
+                    settings: "Your workspace, your boundaries.",
                   } as Record<string, string>
-                )[section] ?? "Your guild"}
+                )[section] ?? "Your workspace"}
               </h1>
             </div>
             <button
               className="button voice-button"
               onClick={() => setVoice(true)}
             >
-              <Mic size={17} /> Ask the guild
+              <Mic size={17} /> Ask Alchemy
             </button>
           </header>
-          {section === "town" && (
-            <GuildOverview onRole={setRole} onCreate={() => setCreate(true)} />
+          {[
+            "pilots",
+            "plan",
+            "tasks",
+            "metrics",
+            "results",
+            "offer",
+            "town",
+          ].includes(section) && (
+            <TrialWorkspace
+              section={
+                (section === "town" ? "pilots" : section) as
+                  "pilots" | "plan" | "tasks" | "metrics" | "results" | "offer"
+              }
+              selectedId={partnerId}
+            />
           )}
           {section === "agents" && <AgentWorkspace />}
           {section === "partners" &&
@@ -493,7 +515,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
           )}
           <footer className="app-footer">
             <span>
-              LAUNCHGUILD{" "}
+              ALCHEMY{" "}
               <span className="muted">
                 / a little structure for the beginning
               </span>
@@ -536,7 +558,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
         </Modal>
       )}
       {voice && (
-        <Modal title="Ask the guild" onClose={() => setVoice(false)}>
+        <Modal title="Ask Alchemy" onClose={() => setVoice(false)}>
           <ConversationProvider>
             <VoicePanel onClose={() => setVoice(false)} />
           </ConversationProvider>

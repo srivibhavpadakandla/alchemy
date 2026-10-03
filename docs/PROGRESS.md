@@ -1,34 +1,30 @@
-# LaunchGuild V5 implementation and acceptance
+# Alchemy implementation and verification
 
-Verified October 3, 2026, in `/Users/srivibhavp/Documents/ChatGPT/rest/launchguild`. Original V2–V4 handoff and unrelated workspace projects are preserved.
+Verified October 3, 2026 in the local application. Current visual reference: [Cosmos](https://www.cosmos.so/). Source migration is maintained separately from generated recordings, credentials, model session files and browser exports.
 
-| Phase                   | Implemented and checked                                                                                                                                                    | Remaining gate                                                                    |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 1. Contracts and shell  | Pinned Next/React/TypeScript project, original V5 brief, canonical JSON, deterministic expectations                                                                        | None for local shell                                                              |
-| 2. Visual system        | Original pixel forest/buildings/agents, landing/login/town/partner/capacity; 28 screenshots at 1440, 1280, 768, 390 px; keyboard/reduced-motion checks                     | No intended-founder usability study                                               |
-| 3. Records/auth         | Separate demo IndexedDB and authenticated live routes; server identity verification; Supabase migrations/RLS; imports/export; SQL denials in PGlite                        | Actual Supabase project, OAuth/email callback and independent-user tests          |
-| 4. Decision engine      | Capacity/dependencies/reserves/ranges/deduplication, readiness, source-backed amendments/observations, promises, protected corrections and undo                            | See KNOWN-LIMITS for prototype boundaries                                         |
-| 5. Five roles           | Bounded actual OpenAI adapter, pinned task input, durable Inngest job adapter, cursor recovery, cancellation quarantine, validated sourced output                          | One genuine run per role; hosted restart/reconnect proof; real model availability |
-| 6. Sponsor integrations | Actual Gemma API adapter and signed ElevenLabs session/tools, setup/error states, text retrieval equivalent                                                                | Genuine Gemma review and ElevenLabs voice session, permission/disconnect tests    |
-| 7. Commit/export/QA     | Reviewed immutable input/result receipts, stale/double-commit rejection, replacement releases assignments, two-tab correction preservation, redacted share/invite adapters | Deployed share/revocation/account/stream checks and public deployment             |
-| 8. Media/handoff        | 120s 1080p demo, independently narrated 30s teaser, separate concurrent-edit proof, SRT/VTT, thumbnail, raw captures, scripts, Devpost draft                               | Replace disclosed integration gaps in footage only after genuine proof            |
+## Delivered locally
 
-## Verification evidence
+The landing page, customer gallery, trial workspace and login use a shared light photographic visual system. Original generated images have documented provenance; examples do not imply actual adoption or measured impact. Motion cleans up on unmount and respects reduced motion. Search and route links lead to usable customer trial pages.
 
-- `npm run typecheck`: passed.
-- `npm test`: 45 passing tests in three files (domain, embedded PostgreSQL, mocked provider contracts).
-- `npm run build`: passed, production server opened at `http://localhost:3210/demo`.
-- `npm run qa`: 13 passing browser tests, including request relink and agreement-versus-payment regressions. Browser checks cover save/refresh, deduplication/commit, source drawer/setup error, export, API denial, four viewport groups, voice text tools, fixture milestone and keyboard focus restoration.
-- Axe scan: zero reported WCAG A/AA violations on the five checked routes (`media/accessibility.json`); this is not a universal accessibility certification.
-- Production dependency audit: zero reported vulnerabilities (`media/dependency-audit.json`).
-- Captured two-tab same-field conflict rejected while the unrelated note was preserved (`media/raw/technical-*.png`, technical proof MP4).
-- Exports downloaded through the UI, reopened as JSON and inspected outside the application (`artifacts/`).
-- Media: ffprobe duration/resolution/codec evidence, full decode, audio-level check, all 120 one-second main-video samples inspected plus teaser/technical contact sheets. Narration is local system speech; listening by a human is not claimed.
+A browser journey creates a customer from conversation notes, defines a baseline and trial, records both plan reviews, enters a compatible measurement, checks the pinned report and next-action task, exports and inspects the report, reloads it, and records an inconclusive commercial decision without inferring payment.
 
-## Account access attempt and next action
+The domain and SQL layer include immutable plan versions and evidence, scoped customer acknowledgment, customer-owned task updates, private attachment metadata, reminder deduplication and atomic measurement/report/action receipts. Hosted storage, authentication and scheduled execution remain unverified.
 
-Computer use reached Supabase's sign-in page in existing Chrome. No signed-in Supabase session was available; continuation requires user authentication and the displayed Terms acceptance. No account/project, credential, billing configuration or external provider call was created. The user requested finishing independent work before reporting account steps. The setup guide now consolidates them.
+Six real local Codex analyses have source-validated receipts across the five roles. The latest Treasurer run completed with the new Alchemy-aware prompt. Output correctly distinguishes fictional legacy observations from current trial plans and does not infer acceptance or payment. Provider authentication, execution, validation and persisted output were visible in the app. Local record files remain excluded from Git.
 
-Next: complete account sign-in, provide local `.env.local` configuration using SETUP.md, apply migrations, then verify independent authenticated sessions and real provider receipts before deployment or sponsor claims. Required blocked integrations remain incomplete. No event submission or repository publication occurred.
+## Verification
 
-Knowledge graph indexed for this project: 534 nodes, 785 edges (fast structure pass).
+- TypeScript check and production build passed.
+- 63 unit, embedded PostgreSQL and mocked-provider tests passed.
+- 17 browser tests passed, including the complete trial journey and downloaded JSON report inspection.
+- Zero reported axe violations across six general routes and five populated trial pages; this is bounded automated evidence.
+- Desktop and 390px mobile screenshots were inspected; horizontal overflow and reduced-motion checks passed.
+- Production dependency audit reported zero vulnerabilities.
+
+Current screenshots are in local `media/screenshots/`; generated test outputs are excluded from source control. Earlier video recordings show the previous interface and are historical evidence only.
+
+## Remaining external gates
+
+Supabase project configuration, Google/email authentication, two independent real accounts, customer invitation/revocation, private file upload/download and Inngest hosted recovery still require live verification. Application OpenAI API access, Gemma and ElevenLabs also require account credentials and real receipts. No public application deployment or real customer outcome is claimed.
+
+Computer use reached Supabase sign-in, which displays Terms acceptance. The user must complete that account step before the integration can be configured. The setup guide lists all six migrations and the exact remaining checks.

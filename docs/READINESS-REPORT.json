@@ -1,28 +1,23 @@
 {
   "date": "2026-10-03",
-  "product": "LaunchGuild V5 local prototype with redesigned UI and verified local Codex execution",
+  "product": "Alchemy local customer-trial application with Cosmos-inspired design",
   "completeV5Acceptance": false,
-  "localUrl": "http://localhost:3210/demo",
+  "localUrl": "http://localhost:3210",
   "typecheck": "passed",
   "productionBuild": "passed",
   "unitSqlMockedProviderTests": {
-    "passed": 45,
+    "passed": 63,
     "failed": 0
   },
   "browserTests": {
-    "passed": 15,
+    "passed": 17,
     "failed": 0
   },
-  "viewports": [
-    1440,
-    1280,
-    768,
-    390
-  ],
-  "axeRoutes": 6,
+  "viewports": [1440, 1280, 768, 390],
+  "axeRoutes": 11,
   "axeReportedViolations": 0,
   "productionAuditReportedVulnerabilities": 0,
-  "actualProviderReceipts": 5,
+  "actualProviderReceipts": 6,
   "deployedAuthVerified": false,
   "publicDeployment": null,
   "externalBlockers": [
@@ -33,7 +28,7 @@
     "ElevenLabs signed agent session"
   ],
   "limitsDocument": "KNOWN-LIMITS.md",
-  "footage": "Original MP4s show the previous interface. New screenshots show the redesigned town and real local agent tasks.",
+  "footage": "Original MP4s show a previous interface. Current screenshots show the Cosmos-inspired design and actual local agent results.",
   "mainMovie": {
     "seconds": 120,
     "width": 1920,
@@ -58,6 +53,18 @@
     "proof": "../artifacts/local-agent-proof.json",
     "cancellationProof": "../artifacts/local-cancellation-proof.json",
     "provider": "Local Codex CLI / existing ChatGPT session",
-    "hostedApiVerified": false
-  }
+    "hostedApiVerified": false,
+    "validatedAnalyses": 6,
+    "latestRun": {
+      "role": "Treasurer",
+      "promptVersion": "alchemy-local-v2",
+      "validated": true,
+      "input": "fictional local records",
+      "result": "saved and visible in the app"
+    }
+  },
+  "hostedPrivateStorageVerified": false,
+  "hostedScheduledJobsVerified": false,
+  "twoAccountTrialJourneyVerified": false,
+  "designDocument": "COSMOS-DESIGN.md"
 }

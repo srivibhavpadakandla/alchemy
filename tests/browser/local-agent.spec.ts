@@ -12,7 +12,8 @@ test("local execution requires same-origin session and rejects unrelated program
   });
   expect(await cross.json()).toEqual({ enabled: false, runs: [] });
   const session = await request.get("/api/local-agent");
-  expect((await session.json()).runs).toEqual([]);
+  const local = await session.json();
+  expect(local.runs).toEqual([]);
   const attack = await request.post("/api/local-agent", {
     headers: { origin: "https://evil.example" },
     data: {},
@@ -22,12 +23,12 @@ test("local execution requires same-origin session and rejects unrelated program
     headers: { origin: "http://localhost:3210" },
     data: { role: "shell", state: { mode: "live" } },
   });
-  expect(malformed.status()).toBe(400);
+  expect(malformed.status()).toBe(local.enabled ? 400 : 403);
   const cancel = await request.delete("/api/local-agent", {
     headers: { origin: "http://localhost:3210" },
     data: { id: crypto.randomUUID() },
   });
-  expect(cancel.status()).toBe(400);
+  expect(cancel.status()).toBe(local.enabled ? 400 : 403);
 });
 test("agent roles and responsive navigation remain accessible without running a model", async ({
   page,

@@ -11,14 +11,17 @@ export default function Invite({
   return (
     <main className="loading-screen">
       <Link className="brand" href="/">
-        LAUNCHGUILD
+        ALCHEMY
       </Link>
-      <h1>Join a partner program.</h1>
+      <h1>Join a shared trial.</h1>
       <p>
         Sign in with the verified email this invitation was addressed to.
         Invitations expire after seven days.
       </p>
-      <Link href="/login" className="button">
+      <Link
+        href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
+        className="button"
+      >
         Sign in first
       </Link>
       <button
@@ -30,7 +33,12 @@ export default function Invite({
             body: JSON.stringify({ action: "accept", token }),
           });
           const b = await r.json();
-          if (r.ok) location.assign(`/app/programs/${b.programId}/town`);
+          if (r.ok)
+            location.assign(
+              b.partnerId
+                ? `/customer/${encodeURIComponent(b.programId)}/${encodeURIComponent(b.partnerId)}`
+                : `/app/programs/${b.programId}/pilots`,
+            );
           else setMessage(b.error);
         }}
       >

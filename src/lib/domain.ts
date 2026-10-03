@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex } from "@noble/hashes/utils.js";
+import {
+  TrialPlanSchema,
+  TrialTaskSchema,
+  TrialMeasurementSchema,
+  TrialDecisionSchema,
+  TrialEventSchema,
+  TrialReportSchema,
+} from "./trials";
 
 export const roles = [
   "Scout",
@@ -314,6 +322,12 @@ export const StateSchema = z.object({
   promises: z.array(PromiseSchema),
   agreements: z.array(AgreementSchema),
   observations: z.array(ObservationSchema),
+  trialPlans: z.array(TrialPlanSchema).default([]),
+  trialTasks: z.array(TrialTaskSchema).default([]),
+  trialMeasurements: z.array(TrialMeasurementSchema).default([]),
+  trialDecisions: z.array(TrialDecisionSchema).default([]),
+  trialEvents: z.array(TrialEventSchema).default([]),
+  trialReports: z.array(TrialReportSchema).default([]),
   scenarios: z.array(ScenarioSchema),
   decisions: z.array(DecisionSchema),
   runs: z.array(RunSchema),
@@ -364,6 +378,14 @@ export function inputHash(s: State) {
     agreements: s.agreements,
     sources: s.sources,
     observations: s.observations,
+    ...(s.trialPlans.length
+      ? {
+          trialPlans: s.trialPlans,
+          trialTasks: s.trialTasks,
+          trialMeasurements: s.trialMeasurements,
+          trialDecisions: s.trialDecisions,
+        }
+      : {}),
   });
 }
 export const money = (cents: number | null, currency = "USD") =>
@@ -548,6 +570,12 @@ export function emptyState(
     promises: [],
     agreements: [],
     observations: [],
+    trialPlans: [],
+    trialTasks: [],
+    trialMeasurements: [],
+    trialDecisions: [],
+    trialEvents: [],
+    trialReports: [],
     scenarios: [],
     decisions: [],
     runs: [],

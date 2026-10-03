@@ -35,6 +35,12 @@
       "tool": "image_gen.imagegen",
       "date": "2026-10-03",
       "provenance": "Original monochrome artwork for the Optiflux reference direction. See docs/OPTIFLUX-DIRECTION.md. Separate from legacy CC0 assets."
+    },
+    {
+      "file": "alchemy-gallery.png",
+      "tool": "image_gen.imagegen",
+      "date": "2026-10-03",
+      "provenance": "Original illustrative editorial photographic contact sheet for the Cosmos-inspired Alchemy design. See docs/COSMOS-DESIGN.md for prompt and limits. Separate from legacy CC0 assets."
     }
   ]
 }

@@ -9,7 +9,7 @@ export async function readAsActor(id: string, actor: string) {
     .eq("program_id", id)
     .eq("user_id", actor)
     .single();
-  if (!membership || membership.role === "viewer")
+  if (!membership || !["owner", "editor"].includes(membership.role))
     throw new DomainError(
       "Editor or owner role required for provider tasks",
       403,
@@ -34,6 +34,12 @@ export async function readAsActor(id: string, actor: string) {
     "proposals",
     "reviews",
     "history",
+    "trial_plans",
+    "trial_tasks",
+    "trial_measurements",
+    "trial_decisions",
+    "trial_events",
+    "trial_reports",
   ];
   const pairs = await Promise.all(
     collections.map(async (table) => {
@@ -44,7 +50,18 @@ export async function readAsActor(id: string, actor: string) {
         .order("version")
         .order("id");
       if (error) throw error;
-      return [table, (data ?? []).map((r) => r.payload)];
+      const key =
+        (
+          {
+            trial_plans: "trialPlans",
+            trial_tasks: "trialTasks",
+            trial_measurements: "trialMeasurements",
+            trial_decisions: "trialDecisions",
+            trial_events: "trialEvents",
+            trial_reports: "trialReports",
+          } as Record<string, string>
+        )[table] ?? table;
+      return [key, (data ?? []).map((r) => r.payload)];
     }),
   );
   const { data: receipts } = await db

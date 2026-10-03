@@ -21,7 +21,7 @@ export default async function Share({
   return (
     <main className="loading-screen">
       <Link className="brand" href="/">
-        LAUNCHGUILD
+        ALCHEMY
       </Link>
       {payload ? (
         <>
