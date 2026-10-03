@@ -29,4 +29,5 @@ jobs:
           done
           cat /tmp/alchemy-server.log
           exit 1
+      - run: mkdir -p media/screenshots artifacts
       - run: npm run qa
